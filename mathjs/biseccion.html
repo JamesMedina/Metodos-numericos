@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+	<html lang="">
+		<head>
+			<meta charset="utf-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<title>Método de bisección</title>
+	
+			<!-- Bootstrap CSS -->
+			<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+	
+			<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+			<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+			<!--[if lt IE 9]>
+				<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+				<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+			<![endif]-->
+			<link rel="stylesheet" type="text/css" href="js/jsxgraph.css" />
+			
+			<script src="//code.jquery.com/jquery.js"></script>
+			<script type="text/javascript" src="js/jsxgraphcore.js"></script>
+			<script type="text/javascript" src="js/funciones.js"></script>
+			<script type="text/javascript" src="js/math.js"></script>
+			<script type="text/javascript">
+				function evaluarFuncion(funcion, a, b) {					
+					var parser = math.parser();
+					parser.eval(funcion);
+					var valorA = parser.set('a', a);
+					var valorB = parser.set('b', b);
+					var paraA = parser.eval('f('+valorA+')');
+					var paraB = parser.eval('f('+valorB+')');
+					var resultado = paraA * paraB;
+					return resultado;
+				}
+
+				function metodoDeBiseccion(){
+					var parser = math.parser();
+					var f = $("#funcion").val();
+					var funcion = "f(x)="+f;
+					var valor_a = $("#valor_a").val();
+					var valor_b = $("#valor_b").val();
+					var intervalo = "["+valor_a+" , "+valor_b+"]";
+					var resultado;
+					
+					resultado = evaluarFuncion(funcion, valor_a, valor_b);
+					var error = 1;
+        			var xr = valor_a;
+	        		if (resultado< 0) {
+
+	            		while (error > 0.00000001) {
+
+	                		var xa = xr;
+	                		xr = (parseFloat(valor_a) + parseFloat(valor_b))/2;
+	                		error = Math.abs(((xr-xa)/xr)*100);
+	                		
+	                		if(evaluarFuncion(funcion, parseFloat(valor_a), xr)<0){
+	                    		valor_b = xr;
+	                		}else{
+	                    		valor_a = xr;
+	                		}
+	            		}
+
+	            		resultadoFinal = xr;
+				    	$('.resultado').append('<p class="lead">- Para la funcion: '+funcion+'<br> con un intervalo '+intervalo+'<br> la raiz es: <span class="text-danger">'+resultadoFinal+'</span></p>');
+						return false;
+			        }else{	
+			        	$('.resultado').append('<p class="lead">- Para la funcion: '+funcion+'<br> con un intervalo '+intervalo+'<br> <span class="text-danger">No se cumple que f(a) * f(b) < 0 <span class="text-danger"></span></p>');
+			            return false;
+			        }  
+				}
+
+				function metodoLimpiar(){
+					 $(":text").val("");
+				}	
+
+				$(document).ready(function() {
+					$('#enviar').click(metodoDeBiseccion);
+					$('#limpiar').click(metodoLimpiar);
+				});
+			
+			</script>
+		</head>
+		<body>
+			<div class="page-header text-center">
+  				<h1>Método de bisección</h1>
+			</div>
+			<div class="container">
+				
+				<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+
+					<form action="" method="POST" role="form" id="formulario">
+
+						<legend>Ingresa los siguientes datos</legend>
+						
+						<label for="funcion">Función</label>
+						<div class="input-group">
+							<span class="input-group-addon"><strong>f(x) = </strong></span>
+							<input type="text" class="form-control input-lg" id="funcion" placeholder="Ingresa la funcion" required="required" oninput="validacion('funcion')" pattern="([a-zA-Z0-9()*/%-^ ]{6,30})">
+						</div>
+						<br>
+
+						<label for="funcion">Intervalo determinado:</label>
+						<div class="input-group">
+							<span class="input-group-addon"><strong>[ </strong></span>
+							<input type="text" class="form-control input-lg" id="valor_a" placeholder="Valor de a" required="required" oninput="validacion('intervalo_a')" pattern="([0-9-.]{1,10})">
+							<span class="input-group-addon"><strong>,</strong></span>
+							<input type="text" class="form-control input-lg" id="valor_b" placeholder="Valor de b" required="required" oninput="validacion('intervalo_a')" pattern="([0-9-.]{1,10})">
+							<span class="input-group-addon">]</span>
+						</div>
+						<br>
+
+						<label for="funcion">Error determinado: </label>
+						<div class="input-group">
+							<span class="input-group-addon"><strong>e =</strong></span>
+							<input type="text" class="form-control input-lg" id="error" placeholder="Indice de error" required="required" oninput="validacion('funcion')">
+						</div>
+						<br>
+						
+						<input type="submit" class="btn btn-lg btn-info" id="enviar" value="Calcular">
+						<input type="submit" class="btn btn-lg btn-warning" id="limpiar" value="Limpiar">
+							
+					</form>
+					<br><br>
+					
+					<div class="resultado">
+  						
+					</div>	
+				</div>
+				
+				<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1">	
+					<div id="box" class="jxgbox" style="width:500px; height:500px;"></div>
+						<script type="text/javascript">
+							var board = JXG.JSXGraph.initBoard('box', {originX: 250, originY: 250, unitX: 50, unitY: 50, axis:true});
+							
+							var graph = board.create('functiongraph',[function(x){ return e^x;}]
+                    );
+						</script>
+						
+				</div>
+			</div>
+			
+			
+			<!-- Bootstrap JavaScript -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		</body>
+	</html>	

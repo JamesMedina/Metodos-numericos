@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+	<html lang="">
+		<head>
+			<meta charset="utf-8">
+			<meta http-equiv="X-UA-Compatible" content="IE=edge">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<title>Método de Newton</title>
+	
+			<!-- Bootstrap CSS -->
+			<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+	
+			<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+			<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+			<!--[if lt IE 9]>
+				<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+				<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+			<![endif]-->
+			<link rel="stylesheet" type="text/css" href="js/jsxgraph.css" />
+			<script src="//code.jquery.com/jquery.js"></script>
+			<script type="text/javascript" src="js/jsxgraphcore.js"></script>
+			<script type="text/javascript" src="js/funciones.js"></script>
+			<script type="text/javascript" src="js/math.js"></script>
+			<script type="text/javascript">
+
+				function metodoDeNewton(){
+					
+					var parser = math.parser();
+					var f = $("#funcion").val();
+					var funcion = "f(x)="+f;
+					var df = $("#derivada_funcion").val();
+					var derivada_funcion = "f(x)="+df;
+					var estimacion_inicial = $("#estimacion_inicial").val();
+					var valor_estimacion_inicial = parser.set('a', estimacion_inicial);
+					var error = 1;
+            		var valor=valor_estimacion_inicial;
+
+            		while (error > 0.00000001) {
+            			
+            			parser.eval(funcion);
+						
+						var f_de_estimaion_inicial = parser.eval('f('+valor+')');
+						parser.eval(derivada_funcion);
+
+						var derivada_f_de_estimacion_inical = parser.eval('f('+valor+')');
+                		xr = valor - (f_de_estimaion_inicial)/(derivada_f_de_estimacion_inical);
+                		
+                		error = Math.abs(((xr - valor)/xr)*100);
+                		valor = xr;
+            		}
+			       
+			        resultadoFinal = xr;
+
+			        $('.resultado').append('<p class="lead">- La raiz de la funcion: '+funcion+'<br> con una estimacion inicial de: '+estimacion_inicial+'<br> es: <span class="text-danger">'+resultadoFinal+'</span></p>');
+					return false;
+				}
+
+				function metodoLimpiar(){
+					 $(":text").val("");
+				}				
+
+				$(document).ready(function() {
+					$('#enviar').click(metodoDeNewton);
+					$('#limpiar').click(metodoLimpiar);
+				});
+			
+			</script>
+		</head>
+		<body>
+			<ul class="nav nav-tabs">
+			  <li class="active"><a href="#">Inicio</a></li>
+			  	<li><a href="http://localhost:85/mathjs/biseccion.html">Método Bisección</a></li>
+			  	<li><a href="http://localhost:85/mathjs/falsaposicion.html">Método Falsa Psición</a></li>
+			  	<li><a href="http://localhost:85/mathjs/secante.html">Método Secante</a></li>
+			  	<li><a href="http://localhost:85/mathjs/newton.html">Método Newton</a></li>
+			</ul>
+			<div class="page-header text-center">
+  				<h1>Método de Newton</h1>
+			</div>
+			<div class="container">
+				
+				<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+
+					<form action="" method="POST" role="form" id="formulario">
+
+						<legend>Ingresa los siguientes datos</legend>
+						
+						<label for="funcion">Función</label>
+						<div class="input-group">
+							<span class="input-group-addon"><strong>f(x) = </strong></span>
+							<input type="text" class="form-control input-lg" id="funcion" placeholder="Ingresa la funcion" required="required" oninput="validacion('funcion')" pattern="([a-zA-Z0-9()*/%-^ ]{6,30})">
+						</div>
+						<br>
+						
+						<label for="funcion">Derivada de la Función</label>
+						<div class="input-group">
+							<span class="input-group-addon"><strong>f'(x) = </strong></span>
+							<input type="text" class="form-control input-lg" id="derivada_funcion" placeholder="Ingresa la derivada" required="required" oninput="validacion('funcion')" pattern="([a-zA-Z0-9()*/%-^ ]{6,30})">
+						</div>
+						<br>
+						
+						<label for="funcion">Estimación inicial</label>
+						<div class="input-group">
+							<span class="input-group-addon"><strong>v = </strong></span>
+							<input type="text" class="form-control input-lg" id="estimacion_inicial" placeholder="Estimación inicial" required="required" oninput="validacion('intervalo_a')" pattern="([0-9-.]{1,10})">
+						</div>
+						<br>
+
+						<label for="funcion">Error determinado: </label>
+						<div class="input-group">
+							<span class="input-group-addon"><strong>e =</strong></span>
+							<input type="text" class="form-control input-lg" id="error" placeholder="Indice de error" required="required" oninput="validacion('funcion')">
+						</div>
+						<br>
+						
+						
+						<input type="submit" class="btn btn-lg btn-info" id="enviar" value="Calcular">
+						<input type="submit" class="btn btn-lg btn-warning" id="limpiar" value="Limpiar">
+						 
+					</form>
+
+					<br><br>
+					<div class=" resultado">
+  						
+					</div>
+						
+
+				</div>
+				
+				<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5 col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1">	
+					<div id="box" class="jxgbox" style="width:500px; height:500px;"></div>
+						<script type="text/javascript">
+							var board = JXG.JSXGraph.initBoard('box', {originX: 250, originY: 250, unitX: 50, unitY: 50, axis:true});
+							
+							var graph = board.create('functiongraph',[function(x){ return e^x;}]
+                    );
+						</script>
+				</div>
+
+			<!-- Bootstrap JavaScript -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+		</body>
+	</html>	
